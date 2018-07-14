@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edsge">
+    <title>Document</title>
+</head>
+<style>
+   .box{
+        width: 100px;
+        height: 100px;
+        font-size: 80px;
+        text-align: center;
+ 
+    }
+    #box00{
+        float: left;
+    }
+    #box01{
+        float: left;
+        border-left: 1px solid;
+        border-right:1px solid; 
+    }
+    #box02{
+        float: left;
+    }
+    #box10{
+        clear: both;
+        float: left;
+        border-top: 1px solid;
+        border-bottom:1px solid; 
+    }
+    #box11{
+        float: left;
+        border: 1px solid;
+    }
+    #box12{
+        float: left;
+        border-top: 1px solid;
+        border-bottom:1px solid; 
+    }
+    #box20{
+        clear: both;
+        float: left;
+    }
+    #box21{
+        float: left;
+        border-left: 1px solid;
+        border-right:1px solid; 
+    }
+    #box22{
+        float: left;
+    }
+    #start{
+        clear: both;
+    }
+    #gameMessage{
+        color: blue;
+        font-size: 50px
+    }
+   
+</style>
+
+<body>
+    <div id="box00" class="box"></div>
+    <div id="box01" class="box"></div>
+    <div id="box02" class="box"></div>
+
+    <div id="box10" class="box"></div>
+    <div id="box11" class="box"></div>
+    <div id="box12" class="box"></div>
+
+    <div id="box20" class="box"></div>
+    <div id="box21" class="box"></div>
+    <div id="box22" class="box"></div>
+    <button id="start" type="button">Start Game</button>
+    <div id="gameMessage">Start the Game!</div>
+</html>
+<script>
+    var startBtn = document.getElementById('start');
+    var restartBtn = document.getElementById('restart');
+    var boxArray = document.getElementsByClassName('box');
+    var gameMessage = document.getElementById('gameMessage');
+    var currentTurn = "X";
+    var turnCount = 0;
+    var gameStarting = 0;
+    var gamePlayArray = [[0,0,0],[0,0,0],[0,0,0]];
+   
+
+   
+    var changedTurn = () => currentTurn == "X" ? "O":"X";
+
+    var draw = (e) => {
+     
+        document.getElementById(e.target.id).innerText = currentTurn;
+        e.target.removeEventListener('click',draw);
+        currentTurn == "X" ? e.target.style.color = "red" : e.target.style.color = "green";
+        currentTurn == "X" ? gameMessage.innerHTML = "It is <span style='color:green'>O</span>'s turns" : gameMessage.innerHTML = "It is <span style='color:red'>X</span>'s turns";
+        turnCount++;
+        doGameLogic(e.target.id,currentTurn);
+    }
+
+
+    
+    startBtn.onclick = (e)=>{
+        if(gameStarting!=1){
+        e.target.innerHTML = 'Restart Game';
+        gameStarting = 1;
+        gameMessage.innerHTML = "It is <span style='color:red'>X</span>'s turns";
+        startGame();
+        }
+        else{
+        gameMessage.innerHTML = "It is <span style='color:red'>X</span>'s turns";
+        restartGame();
+        }
+    }
+
+ //Below is the game controller
+
+    var startGame = () => {
+   
+    for(let i=0; i<=boxArray.length-1;i++){
+        boxArray[i].addEventListener('click',draw)
+    }
+
+    }
+
+    var restartGame = () => {
+
+        gamePlayArray = [[0,0,0],[0,0,0],[0,0,0]];
+        currentTurn = "X";
+        turnCount = 0;
+        for(let i=0; i<=boxArray.length-1;i++){
+        boxArray[i].addEventListener('click',draw);
+        boxArray[i].innerText = "";
+        boxArray[i].style.color = 'black';
+    }
+    }
+  
+
+  //Below is the game Decision
+
+    var gameWin = (winner) => {
+        winner == 1 ? gameMessage.innerHTML = "<span style='color:red'>X</span> is the winner !" : gameMessage.innerHTML = "<span style='color:green'>O</span> is the winner !";
+        for(let i=0; i<=boxArray.length-1;i++){
+        boxArray[i].removeEventListener('click',draw);
+        }
+    }
+
+    var gameDraw = () =>{
+        gameMessage.innerHTML = "The game is draw!";
+        for(let i=0; i<=boxArray.length-1;i++){
+        boxArray[i].removeEventListener('click',draw);
+        }
+    }
+    var doGameLogic = (id,turn) => {
+        console.log(turnCount);
+        var firstIndex = id[3];
+        var secondIndex = id[4];
+        turn == "X" ? gamePlayArray[firstIndex][secondIndex] = 1:gamePlayArray[firstIndex][secondIndex] = 2;
+        currentTurn = changedTurn();
+        if(turnCount>=5){
+            if(gamePlayArray[1][1]==gamePlayArray[0][0]&&gamePlayArray[1][1]==gamePlayArray[2][2])
+            {
+                if(gamePlayArray[1][1]!==0)
+                gameWin(gamePlayArray[1][1]);
+            }
+            else if(gamePlayArray[1][1]==gamePlayArray[0][2]&&gamePlayArray[1][1]==gamePlayArray[2][0]){
+                if(gamePlayArray[1][1]!==0)
+                gameWin(gamePlayArray[1][1]);
+            }
+            else if(gamePlayArray[1][1]==gamePlayArray[0][1]&&gamePlayArray[1][1]==gamePlayArray[2][1]){
+                if(gamePlayArray[1][1]!==0)
+                gameWin(gamePlayArray[1][1]);
+            }
+            else if(gamePlayArray[1][1]==gamePlayArray[1][0]&&gamePlayArray[1][1]==gamePlayArray[1][2]){
+                if(gamePlayArray[1][1]!==0)
+                gameWin(gamePlayArray[1][1]);
+            }
+            else if(gamePlayArray[0][0]==gamePlayArray[0][1]&&gamePlayArray[0][0]==gamePlayArray[0][2]){
+                if(gamePlayArray[0][0]!==0)
+                gameWin(gamePlayArray[0][0]);
+            }
+            else if(gamePlayArray[0][0]==gamePlayArray[1][0]&&gamePlayArray[0][0]==gamePlayArray[2][0]){
+                if(gamePlayArray[0][0]!==0)
+                gameWin(gamePlayArray[0][0]);
+            }
+            else if(gamePlayArray[2][2]==gamePlayArray[2][0]&&gamePlayArray[2][2]==gamePlayArray[2][1]){
+                if(gamePlayArray[2][2]!==0)
+                gameWin(gamePlayArray[2][2]);
+            }
+            else if(gamePlayArray[2][2]==gamePlayArray[0][2]&&gamePlayArray[2][2]==gamePlayArray[1][2]){
+                if(gamePlayArray[2][2]!==0)
+                gameWin(gamePlayArray[2][2]);
+            }
+            else{
+                if(turnCount==9)
+                gameDraw();
+            }
+        }
+    }
+</script>
